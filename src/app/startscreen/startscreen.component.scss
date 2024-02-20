@@ -1,0 +1,13 @@
+.fade-in-animation {
+    animation: showLoginContainer 2s ease-in-out 2000ms forwards;
+    opacity: 0;
+}
+
+@keyframes showLoginContainer {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}

@@ -1,0 +1,117 @@
+<div class="threadContainer">
+
+    <app-threads-header [activeChannelName]="activeChannelName"></app-threads-header>
+    <app-thread-question [usernameCurrentUser]="userFullName"></app-thread-question>
+
+    <!-- Stroke between -->
+    <div class="threadContainerAnswersStroke">
+        <div class="threadContainerAnswers">{{allAnswers.length}} Anworten</div>
+        <div class="threadContainerAnswersStrokeContainer"></div>
+    </div>
+
+    <!-- Thread Answers -->
+    <div class="answersContainer" #answerContainer>
+        <div class="threadContainerAnswer" *ngFor="let answer of allAnswers, let chatIndex = index"
+            [ngClass]="{'threadContainerAnswerReverse' : isCurrentUser(chatIndex)}">
+
+            <div class="profile-message-img">
+                <img class="profile-img"
+                    [src]="answer.profileImg.startsWith('https') ? answer.profileImg : './assets/img/' + answer.profileImg"
+                    alt="">
+                <p class="active-point" *ngIf="answer.isOnline"></p>
+            </div>
+
+            <div class="threadContainerAnswerContainer" [ngClass]="{'flex-end' : isCurrentUser(chatIndex)}">
+
+                <!-- edit MessageContainer -->
+                <div class="editMessageContainer" *ngIf="editAnswers[chatIndex]">
+                    <textarea class="editMessageContainerMessage" [(ngModel)]="editedAnswer"
+                        (keyup.enter)="saveEditedMessage(answer.answerID, chatIndex)"></textarea>
+                    <div class="editMessageContainerReactAndSend">
+                        <div class="emoji-footer-container" (mouseleave)="closeEmojiFooterEdit()">
+                            <div class="emoji-footer-selection" *ngIf="isShowEmojiFooterEdit">
+                                <app-emoji-picker (emojiSelect)="addEmojiToEditMessage($event)"></app-emoji-picker>
+                            </div>
+                            <mat-icon (click)="toggleEmojiFooterEdit()">mood</mat-icon>
+                        </div>
+                        <div class="editMessageContainerReactAndSendBtns" *ngIf="checkMidSize()">
+                            <div class="editMessageBtnMidSize" (click)="cancelEdit(chatIndex)"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></div>
+                            <div class="editMessageBtnMidSize saveBtn" (click)="saveEditedMessage(answer.answerID, chatIndex)"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
+                                </div>
+                        </div>
+                        <div class="editMessageContainerReactAndSendBtns" *ngIf="!checkMidSize()">
+                            <div class="editMessageBtn" (click)="cancelEdit(chatIndex)">Abbrechen</div>
+                            <div class="editMessageBtn saveBtn" (click)="saveEditedMessage(answer.answerID, chatIndex)">
+                                Speichern</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reactionContainer" [ngClass]="{'absoluteLeft' : isCurrentUser(chatIndex), 'd-hidden': editAnswers[chatIndex]}" >
+                    <div class="reactionMenu">
+                        <div class="emoji-container" (mouseleave)="closeEmojiContainers(chatIndex)">
+                            <img (click)="toggleEmoji($event, chatIndex)" src="./assets/img/add_reaction.png"
+                                alt="">
+                            <div *ngIf="answer.isEmojiOpen" class="emoji-selection">
+                                <app-emoji-picker
+                                    (emojiSelect)="handleReactionMessage($event, answer); closeEmojiContainers(chatIndex)"></app-emoji-picker>
+                            </div>
+                        </div>
+                        <div class="editMessage" *ngIf="isCurrentUser(chatIndex)">
+                            <mat-icon>more_vert</mat-icon>
+                            <div class="editMessageBtn">
+                                <span (click)="editAnswer(answer.answerID, chatIndex)">Nachricht bearbeiten</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="threadContainerAnswerInfo"
+                    [ngClass]="{'threadContainerAnswerReverse' : isCurrentUser(chatIndex), 'd-hidden': editAnswers[chatIndex]}">
+                    <div class="threadContainerInfoPerson">{{answer.firstname}} {{answer.lastname}}</div>
+                    <div class="threadContainerInfoTime">{{answer.timestamp}} Uhr</div>
+                </div>
+                <div class="threadContainerTextLeft" [ngClass]="{'answerFromRight' : isCurrentUser(chatIndex)}">
+                    {{answer.answertext}}
+                </div>
+                <a *ngIf="answer.fileUpload && !isPDFFile(answer.fileUpload)" target="_blank"
+                    [href]="answer.fileUpload">
+                    <img class="uploaded-files" [src]="answer.fileUpload">
+                </a>
+                <a *ngIf="answer.fileUpload && isPDFFile(answer.fileUpload)" target="_blank" [href]="answer.fileUpload">
+                    <img class="uploaded-files" src="./assets/img/pdf-icon.png">
+                </a>
+
+                <div class="threadContainerTextReactions" [ngClass]="{'d-hidden': editAnswers[chatIndex]}">
+                    <div class="threadContainerTextReactionsEmojisWrapper">
+                        <div class="threadContainerTextReactionsEmojis" *ngFor="let answer of answer.react">
+                            <div class="reactionsInfoContainer">
+                                <div>{{answer.emoji}}</div>
+                                <div class="reactionsInfoContainerUsers" *ngFor="let user of answer.user; let i = index">
+                                    <div>{{user}}</div>
+                                    <div *ngIf="i < (answer.user.length - 1)"> &</div>
+                                </div>
+                                <span>hat reagiert</span>
+                            </div>
+                            <div>{{answer.emoji}}</div>
+                            <div class="threadContainerTextReactionsAmount">{{answer.user.length}}</div>
+                        </div>
+                    </div> 
+
+                    <div class="emoji-below-answer-container" (mouseleave)="closeEmojiContainers(chatIndex)">
+                        <img (click)="toggleEmojiBelowAnswer($event, chatIndex)"
+                            src="./assets/img/add_reaction.png">
+                        <div *ngIf="answer.isEmojiBelowAnswerOpen" class="emoji-below-answer-selection">
+                            <app-emoji-picker
+                                (emojiSelect)="handleReactionMessage($event, answer); closeEmojiContainers(chatIndex)"></app-emoji-picker>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <app-threads-send-message></app-threads-send-message>
+</div>

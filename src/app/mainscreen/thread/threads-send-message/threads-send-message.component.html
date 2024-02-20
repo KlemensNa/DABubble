@@ -1,0 +1,44 @@
+<div class="footer-write-new-message">
+    <div>
+        <textarea class="textarea" [(ngModel)]="answertext" id="answertext" placeholder="Antworten..." rows="5" cols="20" maxlength="150" (ngModelChange)="onMessageChange()" (keyup.enter)="handleEnterKey()" ></textarea>
+    </div>
+    <div class="footer-line-icons">
+        <div class="footer-icons-left">
+            <label for="fileUploadThread" class="upload">
+                <mat-icon (click)="openFileUpload()">add</mat-icon>
+            </label>
+            <input type="file" id="fileUploadThread" style="display:none;" (change)="uploadFiles($event)">
+            <div class="seperator-vert"></div>
+            <div class="emoji-footer-container" (mouseleave)="closeEmojiFooter()">
+                <div class="emoji-footer-selection" *ngIf="isAnswertextEmojiOpen">
+                  <app-emoji-picker (emojiSelect)="addEmojiToMessage($event); toggleEmojiAnswer()"></app-emoji-picker>
+                </div>
+                <mat-icon (click)="toggleEmojiAnswer()">mood</mat-icon>
+              </div>
+              <mat-icon (click)="initShowChannelMembersFooter()">alternate_email</mat-icon>
+              <div *ngIf="isShowChannelMembersFooter" class="current-channel-member-footer-container" (mouseleave)="closeShowChannelMembersFooter()">
+                  <div class="current-channel-member-footer-list" (click)="addChannelMemberToMessageText(user)"
+                      *ngFor="let user of usersData">
+                      <span>&#64; {{ user.firstname }} {{ user.lastname }}</span>
+                  </div>
+              </div>
+        </div>
+        <div class="image-preview-overlay" *ngIf="fileToUpload">
+            <a class="uploaded-files" *ngIf="fileToUpload.type !== 'application/pdf'" target="_blank" [href]="imagePreview">
+                <img class="uploaded-files" [src]="imagePreview">
+            </a>
+            <a class="uploaded-files" *ngIf="fileToUpload.type === 'application/pdf'" target="_blank" [href]="imagePreview">
+                <img class="uploaded-files" src="./assets/img/pdf-icon.png">
+            </a>
+            <mat-icon (click)="deleteFileUpload()">cancel</mat-icon>
+        </div>
+        <div class="footer-icons-right">
+            <div class="footer-icons-right">
+                <button class="add-btn" mat-icon-button [disabled]="isButtonDisabled" (click)="sendAnswer()">
+                    <mat-icon [ngStyle]="{'color': isButtonDisabled ? 'lightgrey' : '#444DF2', 'cursor': isButtonDisabled ? 'default' : 'pointer'}">send_icon</mat-icon>
+                </button>
+            </div>
+           <!--  <mat-icon title="channel" (click)="sendAnswer()">send_icon</mat-icon> -->
+        </div>
+    </div>
+</div>

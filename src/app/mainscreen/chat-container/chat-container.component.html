@@ -1,0 +1,225 @@
+
+
+
+<!-- *ngIf="this.channelDataService.channelUsers" in class'maincontainer' einfügen zum ausblenden am anfang -->
+<div class="main-container">
+    <div class="header-container">
+        <header class="channel-chat-header">
+            <div class="profile-message-img">
+                <img class="profilPic" [src]="chatPartnerImg.startsWith('https') ? chatPartnerImg : './assets/img/' + chatPartnerImg" alt="">
+                <p class="active-point" *ngIf="isOnline"></p>
+            </div>
+            <span>{{ chatPartnerName }}</span>                
+        </header>
+    </div>
+
+
+    <div class="chatInfo" *ngIf="!chatAllreadyStarted && !selfChat">
+        <div class="chatImgAndName">
+            <div class="chatImg">
+                <img class="profilPic" [src]="chatPartnerImg.startsWith('https') ? chatPartnerImg : './assets/img/' + chatPartnerImg" alt="">
+                <p class="active-point" *ngIf="isOnline"></p>
+            </div>
+            <div class="chatName">{{chatPartnerName}}</div>
+        </div>
+        <div class="chatInfoText">Dieser Unterhaltung findet nur zwischen <span class="namePartner">&#64;{{chatPartnerName}}</span> und dir statt</div>
+    </div>
+
+    <div class="chatInfo" *ngIf="!chatAllreadyStarted && selfChat">
+        <div class="chatImgAndName">
+            <div class="chatImg">
+                <img class="profilPic" [src]="chatPartnerImg.startsWith('https') ? chatPartnerImg : './assets/img/' + chatPartnerImg" alt="">
+                <p class="active-point" *ngIf="isOnline"></p>
+            </div>
+            <div class="chatName">{{chatPartnerName}} (Du)</div>
+        </div>
+        <div class="chatInfoText"><span class="spanInSelfChat">Dieser Raum ist für dich da.</span> Mache dir Notizen, liste deine Todos auf oder bewahre Links und Datein griffbereit aus. Du kannst auch gerne Dinge mit dir selbst besprechen.</div>
+    </div>
+
+
+    <div class="answersContainer" *ngIf="chatAllreadyStarted" #answerContainer>
+        <div class="threadContainerAnswer" 
+            [ngClass]="{'threadContainerAnswerReverse' : message.activeUser}"
+            *ngFor="let message of allMessages, let messageindex = index">
+
+            <div class="profile-message-img">
+                <img class="profilPic" [src]="message.userImg.startsWith('https') ? message.userImg : './assets/img/' + message.userImg" alt="">
+                <p class="active-point" *ngIf="message.isOnline"></p>
+            </div>
+            <div class="threadContainerAnswerContainer" [ngClass]="{'flex-end' : message.activeUser}">
+
+                <!-- edit MessageContainer -->
+                <div class="editMessageContainer" *ngIf="editMessages[messageindex]" >
+                    <textarea class="editMessageContainerMessage" [(ngModel)]="editedMessage" 
+                        (keyup.enter)="saveEditedMessage(message.messageID, messageindex)" rows="5" cols="20" maxlength="150"></textarea>
+                    <div class="editMessageContainerReactAndSend">
+                        <div class="emoji-footer-container" (mouseleave)="closeEmojiFooterEdit()">
+                            <div class="emoji-footer-selection" *ngIf="isShowEmojiFooterEdit">
+                              <app-emoji-picker (emojiSelect)="addEmojiToEditMessage($event)"></app-emoji-picker>
+                            </div>
+                            <mat-icon (click)="toggleEmojiFooterEdit()">mood</mat-icon>
+                        </div>
+                        <div class="editMessageContainerReactAndSendBtns">
+                            <div class="editMessageBtn" (click)="cancelEdit(messageindex)">Abbrechen</div>
+                            <div class="editMessageBtn saveBtn" 
+                            (click)="saveEditedMessage(message.messageID, messageindex)">Speichern</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- reaction Container -->
+                <div class="reactionContainer" [ngClass]="{'absoluteLeft' : message.activeUser, 'd-hidden': editMessages[messageindex]}" >
+                    <div class="reactionMenu">
+
+                        <div class="emoji-container" (mouseleave)="closeEmojiContainers(messageindex)">
+                            <img (click)="toggleEmoji($event, messageindex)" src="./assets/img/add_reaction.png">
+                            <div *ngIf="message.isEmojiOpen"
+                                [ngClass]="isCurrentUser(messageindex) ? 'emoji-selection left-1' : 'emoji-selection right-43'">
+                                <app-emoji-picker
+                                    (emojiSelect)="handleReactionMessage($event, message); closeEmojiContainers(messageindex)"></app-emoji-picker>
+                            </div>
+                        </div>
+
+                        <div class="editMessage" *ngIf="message.activeUser">
+                            <mat-icon>more_vert</mat-icon>
+                            <div class="editMessageBtn">
+                                <span (click)="editMessage(message.messageID, messageindex)">Nachricht bearbeiten</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="threadContainerAnswerInfo"
+                    [ngClass]="{'threadContainerAnswerReverse' : message.activeUser, 'd-hidden': editMessages[messageindex]}" >
+                    <div class="threadContainerInfoPerson">{{message.username}}</div>
+                    <div class="threadContainerInfoTime">{{message.timestamp}} Uhr</div>
+                </div>
+                <div class="threadContainerTextLeft" [ngClass]="{'answerFromRight' : message.activeUser, 'd-hidden': editMessages[messageindex]}" >
+                    {{message.messagetext}}
+                </div>
+                <a *ngIf="!isPDFFile(message.fileUpload)" target="_blank" [href]="message.fileUpload">
+                    <img class="uploaded-files" [src]="message.fileUpload">
+                </a>
+                <a *ngIf="isPDFFile(message.fileUpload)" target="_blank" [href]="message.fileUpload">
+                    <img class="uploaded-files" src="./assets/img/pdf-icon.png">
+                </a>
+                <div class="threadContainerTextReactions" [ngClass]="{'d-hidden': editMessages[messageindex]}">
+                    <div class="threadContainerTextReactionsEmojisWrapper">
+                        <div class="threadContainerTextReactionsEmojis" *ngFor="let reaction of message.react">
+                            <div class="reactionsInfoContainer">
+                                <div>{{reaction.emoji}}</div>
+                                <div class="reactionsInfoContainerUsers"
+                                    *ngFor="let user of reaction.user; let i = index">
+                                    <div class="user">{{user}}</div>
+                                    <div *ngIf="i < (reaction.user.length - 1)"> &</div>
+                                </div>
+                                <span>hat reagiert</span>
+                            </div>
+                            <div>{{reaction.emoji}}</div>
+                            <div class="threadContainerTextReactionsAmount">{{reaction.user.length}}</div>
+                        </div> 
+                    </div>                                       
+                    <div class="emoji-below-answer-container" (mouseleave)="closeEmojiContainers(messageindex)">
+                        <img (click)="toggleEmojiBelowAnswer($event, messageindex)"
+                            src="./assets/img/add_reaction.png">
+                        <div *ngIf="message.isEmojiBelowAnswerOpen" class="emoji-below-answer-selection">
+                            <app-emoji-picker
+                                (emojiSelect)="handleReactionMessage($event, message); closeEmojiContainers(messageindex)"></app-emoji-picker>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-write-new-message">
+        <div>
+          <textarea class="textarea" placeholder="Nachricht an {{ chatPartnerName }}"
+            [(ngModel)]="messagetext" (ngModelChange)="onMessageChange()" (keyup.enter)="sendMessage()" rows="5" cols="20" maxlength="150"></textarea>
+        </div>
+        <div class="footer-line-icons">
+          <div class="footer-icons-left">
+            <label for="fileUploadDirectMessage" class="upload">
+                <mat-icon (click)="openFileUpload()">add</mat-icon>
+            </label>
+            <input type="file" id="fileUploadDirectMessage" style="display:none;" (change)="uploadFiles($event)">
+            <div class="seperator-vert"></div>
+            <div class="emoji-footer-container" (mouseleave)="closeEmojiFooter()">
+              <div class="emoji-footer-selection" *ngIf="isShowEmojiFooter">
+                <app-emoji-picker (emojiSelect)="addEmojiToMessage($event); toggleEmojiFooter()"></app-emoji-picker>
+              </div>
+              <mat-icon (click)="toggleEmojiFooter()">mood</mat-icon>
+            </div>
+            <mat-icon (click)="initShowChannelMembersFooter()">alternate_email</mat-icon>
+              <div *ngIf="isShowChannelMembersFooter" class="current-channel-member-footer-container" (mouseleave)="closeShowChannelMembersFooter()">
+                  <div class="current-channel-member-footer-list" (click)="addChannelMemberToMessageText(user)"
+                      *ngFor="let user of usersData">
+                      <span>&#64; {{ user.firstname }} {{ user.lastname }}</span>
+                  </div>
+              </div>
+          </div>
+          <div class="footer-icons-right">
+            <button class="add-btn" mat-icon-button [disabled]="isButtonDisabled" (click)="sendMessage()">
+                <mat-icon [ngStyle]="{'color': isButtonDisabled ? 'lightgrey' : '#444DF2', 'cursor': isButtonDisabled ? 'default' : 'pointer'}">send_icon</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="image-preview-overlay" *ngIf="fileToUpload">
+            <a class="uploaded-files-preview" *ngIf="fileToUpload.type !== 'application/pdf'" target="_blank" [href]="imagePreview">
+                <img class="uploaded-files-preview" [src]="imagePreview">
+            </a>
+            <a class="uploaded-files-preview" *ngIf="fileToUpload.type === 'application/pdf'" target="_blank" [href]="imagePreview">
+                <img class="uploaded-files-preview" src="./assets/img/pdf-icon.png">
+            </a>
+            <mat-icon (click)="deleteFileUpload()">cancel</mat-icon>
+        </div>
+    </div>
+</div>
+
+<!---------------------------------------------- POPUPS ---------------------------------------------->
+
+
+
+
+<!-- <div class="popup-background profile-background" *ngIf="showProfil" (click)="showProfil = false; closePopup()">
+    <div class="profile-popup" (click)="doNotClose($event)">
+        <div class="headline-container">
+            <span class="fw-700">Profil</span>
+            <div class="close-icon-container" (click)="showProfil = false;">
+                <mat-icon>close</mat-icon>
+            </div>
+        </div>
+
+        <div class="profil-detail-view">
+            <div class="profile-img-big-container">
+                <img [src]="getProfileImagePath(userProfileView)" />
+            </div>
+            <div class="profile-info-container">
+                <span class="profile-name">{{ userProfileView.firstname }} {{ userProfileView.lastname }}</span>
+                <div class="activ-sign" *ngIf="userProfileView.isOnline">
+                    <img src="../../../assets/img/online.png" alt="">
+                    <span class="activ-txt" *ngIf="userProfileView.isOnline">Aktiv</span>
+                </div>
+                <div class="profile-mail-container">
+                    <div class="mail-description">
+                        <img src="../../../assets/img/mail.png" alt="">
+                        <span>E-Mail-Adresse</span>
+                    </div>
+                    <div class="mail-container">
+                        {{ userProfileView.email }}
+                    </div>
+                </div>
+            </div>
+            <div class="message-btn-container" (click)="openChannelDirectMessage()">
+                <button class="btn enabled send-message-btn">
+                    <img src="../../../assets/img/mode_comment.png" alt="">
+                    <span>Nachricht</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div> -->
+
+

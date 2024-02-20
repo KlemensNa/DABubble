@@ -1,0 +1,169 @@
+.footer-write-new-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid #ADB0D9;
+    border-radius: 20px;
+    margin: 10px 45px 45px 45px;
+    height: 145px;
+    padding: 10px;
+    position: relative;
+    
+    @media (max-width: 750px) {
+        margin: 10px 16px 40px 16px;
+    }
+}
+
+.textarea {
+    min-width: 100%;
+    height: 100px;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: 12px 0 12px 25px;
+    font-size: 18px;
+    box-sizing: border-box;
+}
+
+.footer-line-icons {
+  
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 58px;
+
+}
+
+.footer-icons-left {
+
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    color: #686868;
+
+            
+    &:hover {
+        color: black;
+    }
+    mat-icon {
+        padding: 5px;
+        cursor: pointer;
+
+        &:hover {
+            border-radius: 50%;
+            transform: scale(1.1);
+            color: #535AF1;
+            background-color: #ECEEFE;
+            font-weight: 600;
+        }
+    }
+
+    .emoji-footer-container {
+        position: relative;
+
+        .emoji-footer-selection {
+            position: absolute;
+            z-index: 100;
+            bottom: 30px;
+        }
+    }
+
+    ::ng-deep emoji-mart .emoji-mart-category .emoji-mart-emoji span {
+        cursor: pointer;
+    }
+}
+
+.seperator-vert {
+    width: 1px;
+    background-color: #ADB0D9;
+}
+
+.footer-icons-right {
+    padding: 10px;
+    color: #444DF2;
+    button {
+        border: none;
+        background-color: transparent;
+    }
+    &:hover {
+        color: #797EF3;
+    }
+}
+
+.add-btn:not([disabled]) mat-icon:hover {
+    color: #797EF3 !important;
+}
+
+
+
+
+.uploaded-files {
+    max-width: 100px;
+    max-height: 50px;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.image-preview-overlay {
+    position: absolute;
+    top: 112px;
+    left: 165px;
+    cursor: pointer; 
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+    
+
+    &:hover {
+        mat-icon {
+            opacity: 1;
+        }
+    }
+    mat-icon {
+        opacity: 0;
+        color: #686868;
+        transition: opacity 0.3s ease;
+        color: #686868;
+        position: absolute;
+        right: -10px;
+        top: -8px;
+        background: white;
+        border-radius: 100%;
+    }
+}
+
+.file-preview {
+    max-width: 100%;
+    max-height: 50px; 
+    visibility: visible;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+
+// --------------------------------footer show/search @ members----------------------------------
+
+.current-channel-member-footer-container {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #68686850;
+    border-radius: 20px;
+    bottom: 40px;
+    left: 110px;
+    text-wrap: nowrap;
+}
+
+.current-channel-member-footer-list {
+    margin: 15px;
+}
+
+// --------------------------------footer show/search @ members end----------------------------------
+
+
+
+
+
+
+
+

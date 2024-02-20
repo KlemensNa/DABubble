@@ -1,0 +1,252 @@
+<div
+  class="workspace-container"
+>
+  <div class="server-container">
+    <div class="server-logo-name">
+      <img src="./assets/img/workspace_logo.png" />
+      <span>Code learning</span>
+    </div>
+    <div class="direct-message-icon" (click)="OpenNewMessage()">
+      <i class="fa fa-edit"></i>
+    </div>
+  </div>
+
+  <div class="channels-container">
+    <mat-accordion hideToggle>
+      <mat-expansion-panel
+        [expanded]="true"
+        (opened)="panelOpenState1 = true"
+        (closed)="panelOpenState1 = false"
+      >
+        <mat-expansion-panel-header
+          [collapsedHeight]="'60px'"
+          [expandedHeight]="'60px'"
+        >
+          <div class="normal-hover-img">
+            <mat-panel-title class="channels-title">
+              <mat-icon *ngIf="!panelOpenState1">arrow_right</mat-icon>
+              <mat-icon *ngIf="panelOpenState1">arrow_drop_down</mat-icon>
+              <div></div>
+              <mat-icon>workspaces_outlined</mat-icon>
+              <span>Channels</span>
+            </mat-panel-title>
+          </div>
+        </mat-expansion-panel-header>
+
+        <div class="channels-list" *ngIf="channels">
+          <div id="{{ channel.channelID }}" *ngFor="let channel of channels"
+            class="channels-name selectable"
+            (click)="handleClickChannel($event, channel); openChannel(channel.channelID)"
+            [ngClass]="{'selected': channel.channelID === selectedChannelId}">
+            <span class="hashtag">#</span> <!-- *ngIf="channel.isUserMember"  -->
+           <!--  <mat-icon class="locked-channel-icon" *ngIf="!channel.isUserMember">lock_outline</mat-icon> -->
+            <span>{{ channel.channelname }}</span>
+          </div>
+        </div>
+        <div class="channels-add-hover">
+          <div class="channels-add" (click)="openChannelCreateWindow()">
+            <mat-icon>add_circle_outline</mat-icon>
+            <span>Channel hinzufügen</span>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div>
+      <div class="channels-add-icon" (click)="openChannelCreateWindow()">+</div>
+    </div>
+  </div>
+
+  <div class="direct-message-container">
+    <mat-accordion hideToggle>
+      <mat-expansion-panel
+        [expanded]="true"
+        (opened)="panelOpenState2 = true"
+        (closed)="panelOpenState2 = false"
+      >
+        <mat-expansion-panel-header
+          [collapsedHeight]="'60px'"
+          [expandedHeight]="'60px'"
+        >
+          <div class="normal-hover-img">
+            <mat-panel-title class="channels-title direct-message-title">
+              <mat-icon *ngIf="!panelOpenState2">arrow_right</mat-icon>
+              <mat-icon *ngIf="panelOpenState2">arrow_drop_down</mat-icon>
+              <div></div>
+              <img class="normal-img" src="./assets/img/account_circle.png" />
+              <img
+                class="hover-img"
+                src="./assets/img/account_circle_hover.png"
+              />
+              <span>Direktnachrichten</span>
+            </mat-panel-title>
+          </div>
+        </mat-expansion-panel-header>
+
+        <div class="contacts-list">
+          <div
+            class="selectable"
+            [attr.data-username]="user.firstname + ' ' + user.lastname"
+            (click)="handleClickChat($event, user.id)"
+            *ngFor="let user of sortUsers(allUsers, userID)"
+          >
+            <span class="profile">
+              <img [src]="getProfileImagePath(user)" />
+              <p class="active-point" *ngIf="user.isOnline"></p>
+            </span>
+            <span
+              >{{ user.firstname }} {{ user.lastname }}
+              {{ user.id === userID ? "(Du)" : "" }}</span
+            >
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>
+
+<div
+  class="channel-create-container"
+  *ngIf="isChannelCreateWindow"
+  #channelCreateContainer
+>
+  <div class="channel-create-screen" *ngIf="isFirstScreen">
+    <div class="channel-create-title">
+      <div>Channel erstellen</div>
+      <mat-icon
+        class="channels-create-close"
+        (click)="closeChannelCreateWindow()"
+        >close</mat-icon
+      >
+    </div>
+    <div>
+      Channels dienen deinem Team zur Kommunikation. Am besten sollten sie
+      themenbezogen sein #marketing zum Beispiel.
+    </div>
+    <div class="fw-700">Channel-Name</div>
+    <div class="relative">
+      <input
+        placeholder="z.B. Kooperationsprojekte"
+        maxlength="20"
+        type="text"
+        class="channel-create-input channel-create-input-name"
+        (input)="onInputChange($event)"
+        [(ngModel)]="createdChannelName"
+      />
+      <span class="channel-create-input-hashtag">#</span>
+    </div>
+    <div>
+      <span class="fw-700">Beschreibung</span>
+      <span class="gray"> (optional) </span>
+    </div>
+    <input
+      placeholder="Dein Text hier"
+      maxlength="70"
+      type="text"
+      class="channel-create-input channel-create-input-description"
+      [(ngModel)]="createdChannelDescription"
+    />
+    <div class="btn-container">
+      <button
+        (click)="openChannelCreateContainer()"
+        class="btn fw-700"
+        [disabled]="isButtonDisabled"
+      >
+        Erstellen
+      </button>
+    </div>
+  </div>
+  
+  <div class="second-screen-background" *ngIf="isSecondScreen" (click)="closeChannelCreateContainer()"></div>
+  <div class="channel-create-screen second-screen" *ngIf="isSecondScreen">
+    <div
+      class="channel-create-close"
+      *ngIf="isScreenSmall"
+      (click)="closeChannelCreateContainer()"
+    >
+      <img src="./assets/img/channel_create_close.png" />
+    </div>
+    <div class="channel-create-title">
+      <div>Leute hinzufügen</div>
+      <mat-icon class="channels-create-close" (click)="closeChannelCreateWindow()">
+        close
+      </mat-icon>
+    </div>
+    <div>
+      <input
+        type="radio"
+        name="channel-user-selection"
+        id="allUsers"
+        (click)="onHideClick()"
+        class="user-group-radio-button"
+        checked
+      />
+      <label class="user-group-radio-button-label" for="allUsers"
+        >Alle Mitglieder von OfficeTeam hinzufügen</label
+      >
+    </div>
+    <div>
+      <input
+        type="radio"
+        name="channel-user-selection"
+        id="selectedUsers"
+        (click)="onShowClick(); selectUser(user)"
+        class="user-group-radio-button"
+      />
+      <label class="user-group-radio-button-label" for="selectedUsers"
+        >Bestimmte Leute hinzufügen</label
+      >
+    </div>
+    <div
+      class="user-selection-container"
+      *ngIf="isShowInputNames"
+      [@upDownAnimation]
+      >
+        <div class="selected-users" *ngFor="let user of selectedUsers">
+          <span class="profile">
+            <img [src]="getProfileImagePath(user)" />
+          </span>
+          {{ user.firstname + " " + user.lastname }}
+          <span (click)="removeUser(user)"><mat-icon>close</mat-icon></span>
+        </div>
+        <div class="relative">
+          <input
+            placeholder="Name eingeben"
+            type="text"
+            class="channel-create-input channel-create-description-input"
+            (input)="onSearchInputChange($event)"
+            [(ngModel)]="searchQuery"
+          />
+          <div
+            class="contacts-list-pop-up"
+            *ngIf="searchQuery.trim()"
+            [@upDownAnimation]
+          >
+            <div class="contacts-list">
+              <div
+                *ngFor="let user of filterUsers()"
+                [@upDownAnimation]
+                (click)="selectUser(user)"
+              >
+                <span class="profile">
+                  <img [src]="getProfileImagePath(user)" />
+                  <p class="active-point" *ngIf="user.isOnline == true"></p>
+                </span>
+                <span>{{ user.firstname }} {{ user.lastname }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="btn-container">
+      <button class="btn fw-wt-700" (click)="setNewChannelItems()">
+        Erstellen
+      </button>
+    </div>
+  </div>
+</div>
+<div
+  class="channel-create-window"
+  *ngIf="isChannelCreateWindow"
+  (click)="closeChannelCreateWindow()"
+  #channelCreateWindow
+></div>
