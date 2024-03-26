@@ -11,22 +11,22 @@ import { ChatService } from '../../services/chat.service';
 
 
 interface UserData {
-  firstname: string;
-  lastname: string;
-  profileImg: string;
+    firstname: string;
+    lastname: string;
+    profileImg: string;
 }
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrl: './login.component.scss'
 })
 
 export class LoginComponent {
     @Output() openSignup = new EventEmitter<void>();
     @Output() openResetPassword = new EventEmitter<void>();
-    @Output() openImprint = new EventEmitter<void>(); 
-    @Output() openPrivacy = new EventEmitter<void>(); 
+    @Output() openImprint = new EventEmitter<void>();
+    @Output() openPrivacy = new EventEmitter<void>();
     @Output() goBack = new EventEmitter<void>();
     @Output() openSelectAvatar = new EventEmitter<any>();
     logInForm!: FormGroup;
@@ -36,15 +36,17 @@ export class LoginComponent {
     isGoogleLogin: boolean = false;
     isWrongPassword: boolean = false;
     isSubmitted: boolean = false;
-    
-    constructor(private formBuilder: FormBuilder, 
-        private authService: AuthService, 
-        private userservice: UserService, 
-        private router: Router, 
-        private searchservice: SearchService, 
+    guestInfo: boolean = false;
+    uid: string = '';
+
+    constructor(private formBuilder: FormBuilder,
+        private authService: AuthService,
+        private userservice: UserService,
+        private router: Router,
+        private searchservice: SearchService,
         private channelService: ChannelService,
         private chatService: ChatService
-        ) { 
+    ) {
         this.setLoginForm();
     }
 
@@ -55,13 +57,13 @@ export class LoginComponent {
 
         try {
             let userExistsResult = await this.isAlreadyUser(email);
-    
+
             if (userExistsResult.exists) {
                 const { firstname, lastname, profileImg } = userExistsResult.userData!;
-    
+
                 if (firstname && lastname && profileImg) {
                     this.userservice.setUserDetails(firstname, lastname, profileImg);
-                    
+
                     await signInWithEmailAndPassword(this.authService.auth, email, this.logInForm.value.password);
                     let userId = await this.getUserIDFromFirebase(email);
 
@@ -70,13 +72,13 @@ export class LoginComponent {
                         this.router.navigate(['/main', userId]);
                         this.searchservice.loadUsers();
                         this.authService.setSession(userId)
-                    } 
+                    }
                 }
             } else {
                 this.userAlreadyExists = false;
             }
-        } catch (error:any) {
-           /*  this.handleAuthError(error); */
+        } catch (error: any) {
+            /*  this.handleAuthError(error); */
             this.isWrongPassword = true;
         }
     }
@@ -84,7 +86,7 @@ export class LoginComponent {
     async isAlreadyUser(email: string): Promise<{ exists: boolean, userData?: UserData }> {
         try {
             let querySnapshot = await getDocs(query(collection(this.firestore, 'users'), where('email', '==', email)));
-    
+
             if (!querySnapshot.empty) {
                 let userDocument = querySnapshot.docs[0].data() as UserData;
                 return { exists: true, userData: userDocument };
@@ -95,7 +97,7 @@ export class LoginComponent {
             return { exists: false };
         }
     }
-    
+
     setLoginForm() {
         this.logInForm = this.formBuilder.group({
             email: ['', [Validators.required, Validators.email]],
@@ -107,20 +109,30 @@ export class LoginComponent {
         try {
             let result = await signInAnonymously(this.authService.auth);
             let user = result.user;
-            let uid = user?.uid;
-            if (uid) {
+            this.uid = user?.uid;
+            if (this.uid) {
                 this.authService.setAnonymousStatus(true);
                 this.userservice.setUserDetails('Gast', '', 'guest-profile.png');
                 this.isAnonymous = true;
-                await this.authService.setOnlineStatus(uid, true);
-                this.authService.setSession(uid);
-                this.chatService.createChatsForGuest(uid);
-                this.router.navigate(['/main', uid]);                
+                await this.authService.setOnlineStatus(this.uid, true);
+                this.guestInfo = true;
             }
         } catch (error: any) {
-          /*   this.handleAuthError(error); */
+            /*   this.handleAuthError(error); */
         }
     }
+
+    guestInfoConfirm(btnAction: string) {
+        this.guestInfo = false;
+
+        if(btnAction == "forward"){
+            this.chatService.createChatsForGuest(this.uid);
+            this.authService.setSession(this.uid);
+            this.router.navigate(['/main', this.uid])
+        }        
+    }
+
+
 
     async loginWithGoogle() {
         this.isGoogleLogin = true;
@@ -131,20 +143,20 @@ export class LoginComponent {
             // this.authService.setSession(userId);
             let displayName = googleUser.user.displayName;
             let email = googleUser.user.email;
-    
+
             if (displayName && email) {
                 let [firstName, lastName] = displayName.split(' ');
                 await this.handleUserDetails(firstName, lastName, email);
                 this.searchservice.loadUsers();
             }
         } catch (error: any) {
-          /*   this.handleAuthError(error); */
+            /*   this.handleAuthError(error); */
         }
     }
 
     private async handleUserDetails(firstName: string, lastName: string, email: string) {
         const querySnapshot = await getDocs(query(collection(this.firestore, 'users'), where('email', '==', email)));
-    
+
         if (querySnapshot.empty) {
             this.openSelectAvatar.emit({
                 firstname: firstName,
@@ -160,8 +172,8 @@ export class LoginComponent {
             if (userId) {
                 await this.authService.setOnlineStatus(userId, true);
                 this.router.navigate(['/main', userId]);
-            } 
-        } 
+            }
+        }
     }
 
 
@@ -180,9 +192,9 @@ export class LoginComponent {
         }
     }
 
-   /*  private handleAuthError(error: any) {
-        if (error.code === 'auth/invalid-credential') {
-            this.isWrongPassword = true;
-        }
-    } */
+    /*  private handleAuthError(error: any) {
+         if (error.code === 'auth/invalid-credential') {
+             this.isWrongPassword = true;
+         }
+     } */
 }

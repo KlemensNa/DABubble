@@ -4,15 +4,17 @@
 
     <div class="input-container">
         <input formControlName="email" type="email" name="email" placeholder="beispielname@email.com" maxlength="25"
-        [class.red-border]="logInForm.get('email')?.invalid && logInForm.get('email')?.touched" required>
+            [class.red-border]="logInForm.get('email')?.invalid && logInForm.get('email')?.touched" required>
         <mat-icon>mail_outline</mat-icon>
-        <p *ngIf="logInForm.get('email')?.invalid && logInForm.get('email')?.touched">Diese E-Mail-Adresse ist leider ungültig.</p>
+        <p *ngIf="logInForm.get('email')?.invalid && logInForm.get('email')?.touched">Diese E-Mail-Adresse ist leider
+            ungültig.</p>
     </div>
 
     <div class="input-container">
         <input formControlName="password" type="password" name="password" placeholder="Passwort" maxlength="25">
         <mat-icon>lock_outline</mat-icon>
-        <p *ngIf="logInForm.get('password')?.invalid && logInForm.get('password')?.touched || isWrongPassword">Falsches Passwort. Bitte noch einmal versuchen.</p>
+        <p *ngIf="logInForm.get('password')?.invalid && logInForm.get('password')?.touched || isWrongPassword">Falsches
+            Passwort. Bitte noch einmal versuchen.</p>
     </div>
 
     <a class="reset-password" (click)="openResetPassword.emit()">Passwort vergessen?</a>
@@ -21,13 +23,14 @@
         <p>ODER</p>
         <hr>
     </div>
-    
+
     <button (click)="loginWithGoogle()" class="google-btn">
         <img src="./assets/img/google.png">
         <p>Anmelden mit Google</p>
     </button>
     <div class="login-options">
-        <button [disabled]="logInForm.invalid" [class.disabled-btn]="logInForm.invalid" type="submit" class="login-btn">Anmelden</button>
+        <button [disabled]="logInForm.invalid" [class.disabled-btn]="logInForm.invalid" type="submit"
+            class="login-btn">Anmelden</button>
         <button (click)="signInAnonymously()" type="button" class="guest-login-btn">Gäste-Login</button>
     </div>
 
@@ -36,14 +39,31 @@
         <a (click)="openPrivacy.emit()">Datenschutz</a>
     </div>
 
-    <div *ngIf="!userAlreadyExists && !isGoogleLogin && !isAnonymous"  class="confirm-container">
+    <div *ngIf="!userAlreadyExists && !isGoogleLogin && !isAnonymous" class="confirm-container">
         <p class="confirm-text">Du bist noch nicht registriert. Hier geht es zur
             <a (click)="openSignup.emit()">Registrierung</a>
         </p>
     </div>
+   
 </form>
 
 <div class="sign-up-option">
     <p>Neu bei DABubble?</p>
     <a (click)="openSignup.emit()">Konto erstellen</a>
 </div>
+
+
+<div class="guestInfoContainer" *ngIf="guestInfo">
+    <div class="guestInfo" >
+        <h1>Willkommen Gastuser!</h1>
+        <span>Als Gastuser kannst du in Channelchats lesen, jedoch nicht kommentieren. <br>
+            Schreibe DM's mit den Mitgliedern des Netzwerks. <br>Die Chats werden nach dem Ausloggen wieder gelöscht.</span>
+
+        <div class="login-options">
+            <button type="submit" class="login-btn" (click)="guestInfoConfirm('forward')">Weiter als Gast</button>
+            <button (click)="guestInfoConfirm('backward')" type="button" class="guest-login-btn">Zurück</button>
+        </div>
+
+    </div>
+</div> 
+
