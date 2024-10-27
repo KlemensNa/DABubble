@@ -42,8 +42,6 @@ export class ChatService {
   createNewChat(chatname: string, chatUsers: any[]) {
     const newChatRef = doc(this.getChatsRef())
 
-  /*   console.log(newChatRef.id, chatname, chatUsers) */
-
     setDoc(newChatRef, {
       chatID: newChatRef.id,
       chatname: chatname,
@@ -181,10 +179,10 @@ export class ChatService {
     if (!querySnapshot.empty) {
       querySnapshot.forEach(async (chat) => {
         await deleteDoc(chat.ref)
-      /*   console.log("GuestChat deleted ", chat.data()['chatname']) */
+        console.log("GuestChat deleted ", chat.data()['chatname']) 
       })
     } else {
-     /*  console.warn('no Guest Chats to delete') */
+     console.warn('no Guest Chats to delete')
     }
 
   }

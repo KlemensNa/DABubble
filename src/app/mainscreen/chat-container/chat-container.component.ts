@@ -376,7 +376,6 @@ export class ChatContainerComponent {
 
 
   async uploadFiles(event: any) {
-    console.log("uploadFiles")
     let files = event.target.files;
 
     if (!files || files.length === 0) {

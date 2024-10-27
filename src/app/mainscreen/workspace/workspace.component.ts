@@ -606,9 +606,6 @@ export class WorkspaceComponent implements OnInit {
     if (window.innerWidth < 1050) {
       this.main.workspaceOpen = false;
     }
-    
-
-   /*  this.channelDataService.channelName = ''; */
   }
 
 }
