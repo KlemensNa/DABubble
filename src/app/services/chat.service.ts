@@ -167,7 +167,7 @@ export class ChatService {
     const chatname = user.firstname + ' & Gast';
     const chatUsers = newChat;
     this.createNewChat(chatname, chatUsers)
-   /*  console.warn("new Chat createt", chatname) */
+     console.warn("new Chat createt", chatname) 
   }
 
 
@@ -184,6 +184,8 @@ export class ChatService {
     } else {
      console.warn('no Guest Chats to delete')
     }
-
   }
+
+
+  
 }

@@ -99,21 +99,33 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Hier firstname and so zeuch -->
                         <div class="writing-name-sending-time">
                             <ng-container *ngIf="isCurrentUser(chatIndex); else otherUser">
                                 <div class="sending-time fs-14 f400">{{ message.timestamp }} Uhr</div>
                                 <span (click)="setUserProfileView(message); showProfil = true; openPopup()"
-                                    class="writing-name fs-18 fw-700">{{ message.firstname }} {{message.lastname
+                                    class="writing-name fs-18 fw-700">                                    
+                                    {{ 
+                                        message.firstname && message.lastname 
+                                        ? message.firstname + " " + message.lastname
+                                        : message.firstname || message.lastname
                                     }}</span>
                             </ng-container>
                             <ng-template #otherUser>
                                 <div (click)="setUserProfileView(message); showProfil = true; openPopup()"
-                                    class="writing-name fs-18 fw-700">{{ message.firstname }} {{message.lastname }}
+                                    class="writing-name fs-18 fw-700">
+                                    {{ 
+                                        message.firstname && message.lastname 
+                                        ? message.firstname + " " + message.lastname
+                                        : message.firstname || message.lastname
+                                    }}
                                 </div>
                                 <span class="sending-time fs-14 fw-400">{{ message.timestamp }} Uhr</span>
                             </ng-template>
                         </div>
                     </div>
+
+
                     <div id="{{ message.messageID }}" *ngIf="message.messagetext.trim() !== ''"
                         [ngClass]="isCurrentUser(chatIndex) ? 'message-avatar fs-18 fw-400' : 'message-somebody fs-18 fw-400'">
                         {{ message.messagetext }}
@@ -199,7 +211,7 @@
                 </div>
             </div>
             <div class="footer-icons-right">
-                <button class="add-btn" mat-icon-button [disabled]="isButtonDisabled || main.newMessageOpen" (click)="addMessage()">
+                <button class="add-btn" mat-icon-button [disabled]="isButtonDisabled || main.newMessageOpen" (click)="addMessage()" title="sendMessage">
                     <mat-icon
                         [ngStyle]="{'color': isButtonDisabled || main.newMessageOpen ? 'lightgrey' : '#444DF2', 'cursor': isButtonDisabled ? 'default' : 'pointer'}">send_icon</mat-icon>
                 </button>

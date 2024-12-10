@@ -787,17 +787,15 @@ export class ChannelChatComponent implements OnInit, OnDestroy, AfterViewChecked
     const channelID = this.channelDataService.channelID;
     const queryAllAnswers = query(await this.channelService.getMessageRef(channelID));
     
-
+    
     const unsubscribe = onSnapshot(queryAllAnswers, async (querySnapshot) => {     
       
       this.allMessages = [];
-
       for (const doc of querySnapshot.docs) {
-        const messageData = doc.data();
+          const messageData = doc.data();
         const userData = await this.loadUserData(messageData['messageUserID']);
 
         this.isDateAllreadyThere = this.checkDateDuplicate(messageData);
-        
         if (userData) {
           const message = {
             ...messageData,
@@ -805,7 +803,7 @@ export class ChannelChatComponent implements OnInit, OnDestroy, AfterViewChecked
             isEmojiOpen: false,
             dateAllreadyThere: this.isDateAllreadyThere,
             unsubscribe: unsubscribe
-          };
+          }; 
 
           this.allMessages.push(message);
           await this.loadAnswers(messageData['messageID'], doc);
@@ -813,8 +811,7 @@ export class ChannelChatComponent implements OnInit, OnDestroy, AfterViewChecked
         }
         this.sortMessagesByTimeStamp();
         this.editMessages.push(false)
-      }
-
+        }
     });
     // this.updateMessagesWithUserData();
   }
@@ -1184,7 +1181,9 @@ export class ChannelChatComponent implements OnInit, OnDestroy, AfterViewChecked
   }
 
   addChannelMemberToMessageText(user: { firstname: string; lastname: string; }) {
+    console.log("channelChat1")
     this.messagetext += `@${user.firstname}${user.lastname}`;
+    console.log("channelChat1")
     this.closeShowChannelMembersFooter();
   }
 

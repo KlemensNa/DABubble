@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject, Injectable } from '@angular/core';
 import { User } from '../models/user.class';
+import { getDocs, query, collection, where, deleteDoc, Firestore } from '@angular/fire/firestore';
 
 
 @Component({
@@ -7,7 +8,9 @@ import { User } from '../models/user.class';
   templateUrl: './startscreen.component.html',
   styleUrl: './startscreen.component.scss'
 })
+  
 export class StartscreenComponent {
+    firestore: Firestore = inject(Firestore);
     isLogin = true;
     isSignup = false;
     isResetPassword = false;
@@ -18,6 +21,10 @@ export class StartscreenComponent {
     viewsHistory: Array<'login' | 'signup' | 'resetPassword' | 'selectAvatar' | 'imprint' | 'privacy'> = [];
     currentView: 'login' | 'signup' | 'resetPassword' | 'selectAvatar' | 'imprint'| 'privacy' = 'login';
     userData: User = new User();
+
+    ngOnInit(){
+        // this.deleteChatOfKa()
+    }
    
     toggleView(view: 'login' | 'signup' | 'resetPassword' | 'selectAvatar' | 'imprint' | 'privacy' | undefined = 'login', data?: User): void {
         this.viewsHistory.push(this.currentView);
@@ -52,4 +59,20 @@ export class StartscreenComponent {
         }
     }
 
+
+    // Delete Chats automatically
+    // async deleteChatOfKa() {
+
+    //     const querySnapshot = await getDocs(
+    //       query(collection(this.firestore, 'chats'), where('chatname', '==', "Ka & Gast"))
+    //     );
+    //     if (!querySnapshot.empty) {
+    //       querySnapshot.forEach(async (chat) => {
+    //         await deleteDoc(chat.ref)
+    //         console.log("GuestChat deleted ", chat.data()['chatname']) 
+    //       })
+    //     } else {
+    //      console.warn('no Guest Chats to delete')
+    //     }
+    //   }
 }

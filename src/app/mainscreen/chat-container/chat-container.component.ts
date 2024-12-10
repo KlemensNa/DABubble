@@ -123,12 +123,10 @@ export class ChatContainerComponent {
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
         const userData = doc.data();
-
         this.chatPartnerName = `${userData['firstname']} ${userData['lastname']}`;
         this.chatPartnerImg = userData['profileImg'];
         this.isOnline = userData['isOnline'];
         this.channelService.userDataSubject.next({ ...userData });
-
       }
     });
     this.unsubscribeUserData = unsubscribe;
@@ -141,35 +139,18 @@ export class ChatContainerComponent {
     const queryAllAnswers = await query(collection(this.firestore, "chats", this.chatID, "messages"));
 
     this.unsubscribeSnapshot = onSnapshot(queryAllAnswers, (querySnapshot) => {
-
       this.allMessages = [];
       querySnapshot.forEach(async (message) => {
-        // let messageData = ({...message.data(), editMessage: false})
-        
         userIDofThisMessage = message.data()['messageUserID'];        
         const userDatas = await getDoc(doc(this.firestore, 'users', userIDofThisMessage));
         
-        if (message.data()['messageUserID'] === this.userID) {          
-          let updatedMessage = ({
-            ...message.data(),
-            username: userDatas.data()!['firstname'] + ' ' + userDatas.data()!['lastname'],
-            userImg: userDatas.data()!['profileImg'],
-            isOnline: userDatas.data()!['isOnline'],
-            activeUser: true,
-          })
-          this.allMessages.push(updatedMessage);
-
-        } else {
-          let updatedMessage = ({
-            ...message.data(),
-            username: userDatas.data()!['firstname'] + ' ' + userDatas.data()!['lastname'],
-            userImg: userDatas.data()!['profileImg'],
-            isOnline: userDatas.data()!['isOnline'],
-            activeUser: false,
-          })
-          this.allMessages.push(updatedMessage);
-
+        if (userIDofThisMessage === this.userID && userDatas.data()) {  
+          this.loadMessagOfRegistryUser(message.data(), userDatas)
+        }        
+        else {
+          this.loadMessageOfGuest(message.data())   
         }
+
         if(this.allMessages.length != 0){
           this.chatAllreadyStarted = true;
         }
@@ -177,9 +158,31 @@ export class ChatContainerComponent {
         this.sortMessagesByTimeStamp();
       })
       this.editMessages.push(false)
-    });
-    
+    });    
   }
+
+  loadMessagOfRegistryUser(messageData, userData){
+    let updatedMessage = ({
+      ...messageData,
+      username: userData!['firstname'] + ' ' + userData['lastname'],
+      userImg: userData['profileImg'],
+      isOnline: userData['isOnline'],
+      activeUser: true,
+    })  
+    this.allMessages.push(updatedMessage);
+  }
+
+
+  loadMessageOfGuest(messageData){
+    let updatedMessage = ({
+      ...messageData,
+      username: 'Gast',
+      userImg: "../img/guest-profile.png",
+      activeUser: false,
+    })
+    this.allMessages.push(updatedMessage);
+  }
+
 
   sortMessagesByTimeStamp() {
     this.allMessages.sort((a, b) => {
