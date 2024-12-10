@@ -163,7 +163,6 @@ export class ChatService {
     const chatname = user.firstname + ' & Gast';
     const chatUsers = newChat;
     this.createNewChat(chatname, chatUsers)
-     console.warn("new Chat createt", chatname) 
   }
 
 
@@ -176,7 +175,6 @@ export class ChatService {
       querySnapshot.forEach(async (chat) => {
         this.deleteMessages(chat)
         await deleteDoc(chat.ref)
-        console.log("GuestChat deleted ", chat.data()['chatname']) 
       })
     } else {
      console.warn('no Guest Chats to delete')
@@ -188,7 +186,6 @@ export class ChatService {
     
     allMessages.forEach(async (message) => {
       await deleteDoc(message.ref);
-      console.warn("Message deleted")
     });
   }
 

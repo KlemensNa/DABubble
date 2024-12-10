@@ -106,6 +106,10 @@ export class LoginComponent {
     }
 
     async signInAnonymously() {
+        this.guestInfo = true;
+    }
+
+    async signInAsGuest(){
         try {
             let result = await signInAnonymously(this.authService.auth);
             let user = result.user;
@@ -115,7 +119,7 @@ export class LoginComponent {
                 this.userservice.setUserDetails('Gast', '', 'guest-profile.png');
                 this.isAnonymous = true;
                 await this.authService.setOnlineStatus(this.uid, true);
-                this.guestInfo = true;
+                
                 this.userservice.createGuest('Gast', '', 'guest-profile.png', this.uid)
             }
         } catch (error: any) {
@@ -123,13 +127,19 @@ export class LoginComponent {
         }
     }
 
-    guestInfoConfirm(btnAction: string) {
+    async guestInfoConfirm(btnAction: string) {
         this.guestInfo = false;
 
         if(btnAction == "forward"){
-            this.chatService.createChatsForGuest(this.uid);
-            this.authService.setSession(this.uid);
-            this.router.navigate(['/main', this.uid])
+            await this.signInAsGuest()
+
+            if (this.uid) {
+                await this.chatService.createChatsForGuest(this.uid);
+                this.authService.setSession(this.uid);
+                this.router.navigate(['/main', this.uid]);
+            } else {
+                console.error('UID ist nicht verfügbar!');
+            }
         }        
     }
 

@@ -582,7 +582,6 @@ export class ChannelChatComponent implements OnInit, OnDestroy, AfterViewChecked
 
       this.deleteMessagesAnswers(message.id)
       deleteDoc(message.ref);
-      console.log('messages gelöscht', message.ref)
     })
   }
 
@@ -1182,9 +1181,7 @@ export class ChannelChatComponent implements OnInit, OnDestroy, AfterViewChecked
   }
 
   addChannelMemberToMessageText(user: { firstname: string; lastname: string; }) {
-    console.log("channelChat1")
     this.messagetext += `@${user.firstname}${user.lastname}`;
-    console.log("channelChat1")
     this.closeShowChannelMembersFooter();
   }
 

@@ -229,7 +229,6 @@ export class MainscreenComponent implements OnInit/* , AfterViewInit  */ {
     }
 
     logout(userId: string) {
-        console.log(this.userFullName)
         if(this.userFullName.trim() === "Gast"){
             this.userservice.deleteGuest(userId)
           }        

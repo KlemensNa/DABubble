@@ -98,7 +98,6 @@ export class ChatContainerComponent {
         return 
       }
     })    
-    console.log(array)
     if(this.userID == chatPartnerID){
       array.forEach((chat) => {      
         this.chatID = chat['chatID']
@@ -161,7 +160,6 @@ export class ChatContainerComponent {
 
   loadMessagOfRegistryUser(messageData, userData){
 
-    console.warn(userData, messageData)
     let updatedMessage = ({
       ...messageData,
       username: userData!['firstname'] + ' ' + userData['lastname'],
