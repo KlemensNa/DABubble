@@ -717,6 +717,7 @@ export class ChannelChatComponent implements OnInit, OnDestroy, AfterViewChecked
     if (user.profileImg.startsWith('https://firebasestorage.googleapis.com')) {
       return user.profileImg;
     } else {
+      
       return `./assets/img/${user.profileImg}`;
     }
   }

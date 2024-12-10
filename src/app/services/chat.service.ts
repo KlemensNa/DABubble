@@ -147,21 +147,17 @@ export class ChatService {
   }
 
 
-  createChatsForGuest(guestID) {
+  async createChatsForGuest(guestID) {
 
-    const allUsersQuery = query(this.getUsersRef())
-
-    this.unsubscribeSnapshot = onSnapshot(allUsersQuery, (querySnapshot) => {      
-      this.buildUserArray(querySnapshot);
-      this.allUsers.forEach((user: any) => {
-        this.buildNewChatGuest(user, guestID);
-      })
-    });
+    const querySnapshot = await getDocs(this.getUsersRef());
+    this.buildUserArray(querySnapshot)
+    this.allUsers.forEach((user: any) => {
+      this.buildNewChatGuest(user, guestID);
+    })   
   }
 
   buildNewChatGuest(user: any, guestID: any) {
     let newChat: any[] = [];
-
     newChat.push(user.id, guestID);    
 
     const chatname = user.firstname + ' & Gast';
@@ -178,6 +174,7 @@ export class ChatService {
     );
     if (!querySnapshot.empty) {
       querySnapshot.forEach(async (chat) => {
+        this.deleteMessages(chat)
         await deleteDoc(chat.ref)
         console.log("GuestChat deleted ", chat.data()['chatname']) 
       })
@@ -186,6 +183,14 @@ export class ChatService {
     }
   }
 
+  async deleteMessages(chat){
+    const allMessages = await getDocs(collection(this.firestore, "chats", chat.ref.id, "messages"))
+    
+    allMessages.forEach(async (message) => {
+      await deleteDoc(message.ref);
+      console.warn("Message deleted")
+    });
+  }
 
   
 }

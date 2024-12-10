@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Auth, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, getAuth, updateEmail, sendEmailVerification, signInWithEmailAndPassword, User} from '@angular/fire/auth';
+import { Auth, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, } from '@angular/fire/auth';
 import { BehaviorSubject } from 'rxjs';
 import { Firestore, doc, getDoc, updateDoc } from '@angular/fire/firestore';import { ChatService } from './chat.service';
-import { verifyBeforeUpdateEmail } from 'firebase/auth';
+import { UserService } from './user.service';
 ;
 
 @Injectable({
@@ -50,7 +50,7 @@ export class AuthService {
 
     async logout(userId: string) {
         this.setAnonymousStatus(false);
-        
+
         try {
             const user = this.auth.currentUser;
     

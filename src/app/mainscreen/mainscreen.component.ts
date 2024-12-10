@@ -17,6 +17,7 @@ import { Message } from '../models/message.interface';
 import { DomSanitizer } from '@angular/platform-browser';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { ChannelChatComponent } from './channel-chat/channel-chat.component';
+import { ChatService } from '../services/chat.service';
 
 @Component({
     selector: 'app-mainscreen',
@@ -228,7 +229,12 @@ export class MainscreenComponent implements OnInit/* , AfterViewInit  */ {
     }
 
     logout(userId: string) {
+        console.log(this.userFullName)
+        if(this.userFullName.trim() === "Gast"){
+            this.userservice.deleteGuest(userId)
+          }        
         this.authService.logout(userId);
+        
         this.router.navigate(['/']);
     }
 

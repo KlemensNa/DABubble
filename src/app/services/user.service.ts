@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { DocumentData, DocumentSnapshot, Firestore, collection, doc, getDoc, getDocs, query, where } from '@angular/fire/firestore';
+import { DocumentData, DocumentSnapshot, Firestore, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ActivatedRoute } from '@angular/router';
@@ -31,6 +31,21 @@ export class UserService {
         this.userLastName = lastName;
         this.userImg = profileImg;
         this.saveUserData();
+    }
+
+
+    async createGuest(firstname, lastname, profileImg, id){
+        const guestUser = {
+            firstname: firstname,
+            lastname: lastname,
+            profileImg: profileImg,
+            id: id
+        }
+        await setDoc(doc(this.firestore, "users", id), guestUser);
+    }
+
+    async deleteGuest(id){
+        await deleteDoc(doc(this.firestore, "users", id))
     }
 
     getUserFirstName(): string {

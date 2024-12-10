@@ -64,7 +64,7 @@ export class StartscreenComponent {
     // async deleteChatOfKa() {
 
     //     const querySnapshot = await getDocs(
-    //       query(collection(this.firestore, 'chats'), where('chatname', '==', "Ka & Gast"))
+    //       query(collection(this.firestore, 'chats'), where('chatname', '==', "Lord & Gast"))
     //     );
     //     if (!querySnapshot.empty) {
     //       querySnapshot.forEach(async (chat) => {

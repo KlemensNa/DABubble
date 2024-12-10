@@ -94,23 +94,21 @@ export class ChatContainerComponent {
 
       if (chatData['chatUsers'].includes(this.userID)) {
         array.push(chatData)
-      } else { return }
+      } else { 
+        return 
+      }
     })    
-   
+    console.log(array)
     if(this.userID == chatPartnerID){
-      array.forEach((chat) => {
-      
-      if(chat['chatUsers'].length ==1){
+      array.forEach((chat) => {      
         this.chatID = chat['chatID']
-        } 
       }    
       
     )} else {
       array.forEach((chat) => {
-      
         if(chat['chatUsers'].includes(chatPartnerID)){
           this.chatID = chat['chatID']
-          } 
+          }
         })
     }
 
@@ -137,7 +135,7 @@ export class ChatContainerComponent {
 
     let userIDofThisMessage;
     const queryAllAnswers = await query(collection(this.firestore, "chats", this.chatID, "messages"));
-
+    
     this.unsubscribeSnapshot = onSnapshot(queryAllAnswers, (querySnapshot) => {
       this.allMessages = [];
       querySnapshot.forEach(async (message) => {
@@ -145,7 +143,7 @@ export class ChatContainerComponent {
         const userDatas = await getDoc(doc(this.firestore, 'users', userIDofThisMessage));
         
         if (userIDofThisMessage === this.userID && userDatas.data()) {  
-          this.loadMessagOfRegistryUser(message.data(), userDatas)
+          this.loadMessagOfRegistryUser(message.data(), userDatas.data())
         }        
         else {
           this.loadMessageOfGuest(message.data())   
@@ -162,6 +160,8 @@ export class ChatContainerComponent {
   }
 
   loadMessagOfRegistryUser(messageData, userData){
+
+    console.warn(userData, messageData)
     let updatedMessage = ({
       ...messageData,
       username: userData!['firstname'] + ' ' + userData['lastname'],

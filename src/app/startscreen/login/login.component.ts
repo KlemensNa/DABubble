@@ -116,6 +116,7 @@ export class LoginComponent {
                 this.isAnonymous = true;
                 await this.authService.setOnlineStatus(this.uid, true);
                 this.guestInfo = true;
+                this.userservice.createGuest('Gast', '', 'guest-profile.png', this.uid)
             }
         } catch (error: any) {
             /*   this.handleAuthError(error); */
